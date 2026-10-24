@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #06080F;
+    color: #F8FAFC;
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  }
+}
+
+/* Subtle Sbay Grid Background */
+.sbay-grid-bg {
+  background-color: transparent;
+  background-image: 
+    linear-gradient(rgba(59, 130, 246, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Glassmorphism Card Style */
+.sbay-card {
+  background: rgba(13, 19, 34, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.25s ease-in-out;
+}
+
+.sbay-card:hover {
+  border-color: rgba(59, 130, 246, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Glass Panel for Floating Nav */
+.sbay-nav {
+  background: rgba(10, 15, 29, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Blue Glow Button */
+.btn-primary-blue {
+  background-color: #2563EB;
+  color: #FFFFFF;
+  box-shadow: 0 0 20px -3px rgba(37, 99, 235, 0.5);
+  transition: all 0.2s ease;
+}
+
+.btn-primary-blue:hover {
+  background-color: #1D4ED8;
+  box-shadow: 0 0 25px 0 rgba(37, 99, 235, 0.7);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #06080F;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3B82F6;
+}
+
+  @media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes floatParticle {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) scale(0.9);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-25px) translateX(15px) scale(1.3);
+    opacity: 0.9;
+  }
+}
+
+.animate-particle {
+  animation: floatParticle 7s ease-in-out infinite;
+}
+
+@keyframes pulseAura {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.06);
+  }
+}
+
+.animate-pulse-aura {
+  animation: pulseAura 4s ease-in-out infinite;
+}
+
