@@ -6,9 +6,33 @@ import { supabase, isSupabaseConfigured } from '../services/supabaseClient';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    const token = getAuthToken();
+    if (!token) return null;
+    try {
+      const saved = localStorage.getItem('dara_user_profile');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [loading, setLoading] = useState(() => !getAuthToken());
   const { showToast } = useToast();
+
+  const setSession = (userData, token = null) => {
+    if (token) {
+      setAuthToken(token);
+    }
+    if (userData) {
+      setUser(userData);
+      localStorage.setItem('dara_user_profile', JSON.stringify(userData));
+      if (typeof userData.walletBalance === 'number') {
+        const bal = parseFloat(userData.walletBalance.toFixed(2));
+        setWalletBalance(bal);
+        localStorage.setItem('sbay_wallet_balance', bal.toString());
+      }
+    }
+  };
 
   // Wallet & Dashboard Stats
   const [walletBalance, setWalletBalance] = useState(() => {
@@ -117,26 +141,33 @@ export function AuthProvider({ children }) {
     const token = getAuthToken();
     if (!token) {
       setUser(null);
+      localStorage.removeItem('dara_user_profile');
       setLoading(false);
       return;
     }
 
     try {
       const res = await api.getMe();
-      if (res.success && res.user) {
+      if (res && res.success && res.user) {
         setUser(res.user);
+        localStorage.setItem('dara_user_profile', JSON.stringify(res.user));
         if (typeof res.user.walletBalance === 'number') {
-          setWalletBalance(res.user.walletBalance);
-          localStorage.setItem('sbay_wallet_balance', res.user.walletBalance.toString());
+          const bal = parseFloat(res.user.walletBalance.toFixed(2));
+          setWalletBalance(bal);
+          localStorage.setItem('sbay_wallet_balance', bal.toString());
         }
-      } else {
+      } else if (res && (res.status === 401 || res.error?.includes('expired') || res.error?.includes('Authentication required'))) {
         setAuthToken(null);
         setUser(null);
+        localStorage.removeItem('dara_user_profile');
       }
     } catch (err) {
-      console.warn('Failed to fetch auth profile:', err.message);
-      setAuthToken(null);
-      setUser(null);
+      console.warn('Auth profile verification note:', err.message);
+      if (err.status === 401) {
+        setAuthToken(null);
+        setUser(null);
+        localStorage.removeItem('dara_user_profile');
+      }
     } finally {
       setLoading(false);
     }
@@ -315,6 +346,7 @@ export function AuthProvider({ children }) {
     }
     setAuthToken(null);
     setUser(null);
+    localStorage.removeItem('dara_user_profile');
     setWalletBalance(0.00);
     localStorage.removeItem('sbay_wallet_balance');
     localStorage.removeItem('sbay_total_deposited');
@@ -342,6 +374,7 @@ export function AuthProvider({ children }) {
     registerWithEmail,
     devLogin,
     logout,
+    setSession,
     refreshUser: fetchCurrentUser,
   };
 

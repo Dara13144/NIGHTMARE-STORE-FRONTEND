@@ -9,7 +9,7 @@ import { supabase, isSupabaseConfigured } from '../services/supabaseClient';
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { refreshUser } = useAuth();
+  const { refreshUser, setSession } = useAuth();
   const { showToast } = useToast();
   const [errorMsg, setErrorMsg] = useState(null);
 
@@ -37,12 +37,16 @@ export default function AuthCallback() {
           if (isGoogleCallback) {
             const res = await api.googleCallback(code, state, redirectUri);
             if (res.success && res.token) {
-              setAuthToken(res.token);
-              await refreshUser();
+              if (setSession && res.user) {
+                setSession(res.user, res.token);
+              } else {
+                setAuthToken(res.token);
+              }
+              await refreshUser().catch(() => {});
               if (res.linked) {
                 showToast('Google account connected successfully to your store profile!', 'success');
               } else {
-                showToast(`Welcome back, ${res.user.displayName || res.user.username}!`, 'success');
+                showToast(`Welcome back, ${res.user?.displayName || res.user?.username || 'Gamer'}!`, 'success');
               }
               navigate('/dashboard', { replace: true });
               return;
@@ -55,12 +59,16 @@ export default function AuthCallback() {
           if (isDiscordCallback) {
             const res = await api.discordCallback(code, state, redirectUri);
             if (res.success && res.token) {
-              setAuthToken(res.token);
-              await refreshUser();
+              if (setSession && res.user) {
+                setSession(res.user, res.token);
+              } else {
+                setAuthToken(res.token);
+              }
+              await refreshUser().catch(() => {});
               if (res.linked) {
                 showToast('Discord account connected successfully to your store profile!', 'success');
               } else {
-                showToast(`Welcome back, ${res.user.displayName || res.user.username}!`, 'success');
+                showToast(`Welcome back, ${res.user?.displayName || res.user?.username || 'Gamer'}!`, 'success');
               }
               navigate('/dashboard', { replace: true });
               return;
@@ -128,12 +136,16 @@ export default function AuthCallback() {
           // Google OAuth flow
           const res = await api.googleCallback(code, state, redirectUri);
           if (res.success && res.token) {
-            setAuthToken(res.token);
-            await refreshUser();
+            if (setSession && res.user) {
+              setSession(res.user, res.token);
+            } else {
+              setAuthToken(res.token);
+            }
+            await refreshUser().catch(() => {});
             if (res.linked) {
               showToast('Google account connected successfully to your store profile!', 'success');
             } else {
-              showToast(`Welcome back, ${res.user.displayName || res.user.username}!`, 'success');
+              showToast(`Welcome back, ${res.user?.displayName || res.user?.username || 'Gamer'}!`, 'success');
             }
             navigate('/dashboard', { replace: true });
             return;
@@ -146,12 +158,16 @@ export default function AuthCallback() {
         // Discord OAuth flow
         const res = await api.discordCallback(code, state, redirectUri);
         if (res.success && res.token) {
-          setAuthToken(res.token);
-          await refreshUser();
+          if (setSession && res.user) {
+            setSession(res.user, res.token);
+          } else {
+            setAuthToken(res.token);
+          }
+          await refreshUser().catch(() => {});
           if (res.linked) {
             showToast('Discord account connected successfully to your store profile!', 'success');
           } else {
-            showToast(`Welcome back, ${res.user.displayName || res.user.username}!`, 'success');
+            showToast(`Welcome back, ${res.user?.displayName || res.user?.username || 'Gamer'}!`, 'success');
           }
           navigate('/dashboard', { replace: true });
         } else {
