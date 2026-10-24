@@ -171,7 +171,10 @@ export function AuthProvider({ children }) {
       return devLogin('discord');
     }
     try {
-      const redirectUri = `${window.location.origin}/auth/discord/callback`;
+      const origin = window.location.origin.includes('nightmarestore.site')
+        ? 'https://www.nightmarestore.site'
+        : window.location.origin;
+      const redirectUri = `${origin}/auth/discord/callback`;
       // Try to get auth url from backend
       const res = await api.getDiscordAuthUrl(redirectUri).catch(() => null);
 
@@ -208,7 +211,10 @@ export function AuthProvider({ children }) {
         }
       }
 
-      const redirectUri = `${window.location.origin}/auth/google/callback`;
+      const origin = window.location.origin.includes('nightmarestore.site')
+        ? 'https://www.nightmarestore.site'
+        : window.location.origin;
+      const redirectUri = `${origin}/auth/google/callback`;
 
       // 1. Fetch official Google OAuth URL from Backend API
       const backendRes = await api.getGoogleAuthUrl(redirectUri).catch(() => null);
